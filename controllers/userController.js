@@ -23,7 +23,7 @@ export const listUsers = async (req, res) => {
     if (response.ok) {
       return res.status(200).json(response.data);
     } else {
-      return res.status(200).json({ err: response.err });
+      return res.status(400).json({ err: response.err });
     }
   } catch (err) {
     console.log("here");

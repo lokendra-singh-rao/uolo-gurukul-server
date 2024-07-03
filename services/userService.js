@@ -36,7 +36,7 @@ export const listUsers = async ({ page, query }) => {
 
     return { ok: true, data: data };
   } catch (err) {
-    return { ok: false, err: err.message };
+    return { ok: false, err: "Something went wrong! Please try again" };
   }
 };
 
@@ -70,7 +70,7 @@ export const addUser = async ({ name, email, password, image }) => {
       return { ok: false, err: "Email already registered!" };
     }
   } catch (err) {
-    return { ok: false, err: err.message };
+    return { ok: false, err: "Something went wrong! Please try again" };
   }
 };
 
@@ -84,6 +84,6 @@ export const deleteUser = async ({ id }) => {
       return { ok: true, data: "User deleted successfully!" };
     }
   } catch (err) {
-    return { ok: false, err: err.message };
+    return { ok: false, err: "Something went wrong! Please try again" };
   }
 };
