@@ -5,7 +5,7 @@ import { getSignedUrlS3, uploadFile } from "../middlewares/imageHandler.js";
 
 export const listUsers = async ({ page, query }) => {
   try {
-    const itemsPerPage = 10;
+    const itemsPerPage = 5;
 
     const users = await userRepository.listUsers({ page, query, itemsPerPage });
 

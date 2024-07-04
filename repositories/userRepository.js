@@ -21,7 +21,6 @@ export const getTotalUsers = async () => {
 
 export const addUser = async (name, email, password, image) => {
   try {
-    console.log("sd1");
     let active = true;
     const response = await userModel.create({
       name,
@@ -30,10 +29,8 @@ export const addUser = async (name, email, password, image) => {
       image,
       active,
     });
-    console.log("sd");
     return response;
   } catch (error) {
-    console.log(error);
     throw new Error(error);
   }
 };
