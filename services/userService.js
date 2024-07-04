@@ -2,10 +2,11 @@ import * as userRepository from "../repositories/userRepository.js";
 import { v4 } from "uuid";
 import { encryptPassword } from "../utilities/passwordUtils.js";
 import { getSignedUrlS3, uploadFile } from "../middlewares/imageHandler.js";
+import { ingestUser } from "../middlewares/elasticSearchHandlers.js";
 
 export const listUsers = async ({ page, query }) => {
   try {
-    const itemsPerPage = 5;
+    const itemsPerPage = 2;
 
     const users = await userRepository.listUsers({ page, query, itemsPerPage });
 

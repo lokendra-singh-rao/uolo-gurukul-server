@@ -18,7 +18,7 @@ app.use(userRouters);
 
 //test endpoint
 app.use("/test", async (req, res) => {
-  throw new Error("error caught");
+  res.send("success");
 });
 
 //Called when any error is thrown
