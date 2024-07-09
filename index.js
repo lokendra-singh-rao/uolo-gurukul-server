@@ -25,5 +25,5 @@ app.use((_, res) => {
 
 //Called when server starts
 app.listen(port, (req, res) => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log("🖥️  Server running at http://localhost:" + `${port}`);
 });
