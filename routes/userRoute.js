@@ -4,12 +4,15 @@ import {
   deleteUser,
   listUsers,
 } from "../controllers/userController.js";
-import multer from "multer";
+import multer, { memoryStorage } from "multer";
 
 const router = express.Router();
-const upload = multer({ storage: multer.memoryStorage() });
-router.get("/listUsers", listUsers);
-router.post("/addUser", upload.single("image"), addUser);
-router.delete("/delete", deleteUser);
+const upload = multer({ storage: memoryStorage() });
+
+router
+  .route("/users")
+  .get(listUsers)
+  .post(upload.single("image"), addUser)
+  .delete(deleteUser);
 
 export default router;

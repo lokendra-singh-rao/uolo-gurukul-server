@@ -1,6 +1,6 @@
 import * as userService from "../services/userService.js";
 import {
-  isAlphabetsOnly,
+  isAlphanumeric,
   isEmailValid,
   isNumbericalOnly,
   isValidImage,
@@ -15,7 +15,7 @@ export const listUsers = async (req, res) => {
     }
 
     // search query validation
-    if (!(isAlphabetsOnly(query) || isEmailValid(query) || !query)) {
+    if (!(isAlphanumeric(query) || isEmailValid(query) || !query)) {
       return res.status(400).json({ error: "search query invalid!" });
     }
     const response = await userService.listUsers({ page, query });
@@ -26,7 +26,6 @@ export const listUsers = async (req, res) => {
       return res.status(400).json({ err: response.err });
     }
   } catch (err) {
-    console.log("here");
     return res.status(400).json({ err: err.message });
   }
 };
@@ -37,7 +36,7 @@ export const addUser = async (req, res) => {
     const image = req.file;
 
     // name validation
-    if (!isAlphabetsOnly(name)) {
+    if (!isAlphanumeric(name)) {
       return res.status(400).json({ err: "invalid name!" });
     }
 
@@ -57,6 +56,7 @@ export const addUser = async (req, res) => {
       password,
       image,
     });
+
     if (response.ok) {
       return res.status(200).json(response.data);
     } else {

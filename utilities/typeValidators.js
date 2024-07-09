@@ -1,7 +1,7 @@
 const emailRegex =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 const numCheck = /^[0-9]+$/;
-const stringCheck = /^[A-Za-z]+$/;
+const alphanumericCheck = /^[A-Za-z0-9]+$/;
 
 export function isEmailValid(email) {
   if (!email || email.length > 254) return false;
@@ -19,13 +19,10 @@ export function isEmailValid(email) {
   return true;
 }
 
-export function isAlphabetsOnly(string) {
+export function isAlphanumeric(string) {
+  if (!string || string?.length < 3) return false;
   const parts = string.split(" ");
-  parts.forEach((part) => {
-    if (!stringCheck.test(part)) return false;
-  });
-
-  return true;
+  return parts.every((part) => alphanumericCheck.test(part));
 }
 
 export function isNumbericalOnly(num) {

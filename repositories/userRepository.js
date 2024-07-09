@@ -1,33 +1,41 @@
 import { userModel } from "../models/userModel.js";
 
 export const listUsers = async ({ page, query, itemsPerPage }) => {
-  const users = await userModel
-    .find({
-      active: true,
-      $or: [
-        { name: { $regex: query, $options: "i" } },
-        { email: { $regex: query, $options: "i" } },
-      ],
-    })
-    .skip(itemsPerPage * (page - 1))
-    .limit(itemsPerPage);
-  return users;
+  try {
+    const users = await userModel
+      .find({
+        active: true,
+        $or: [
+          { name: { $regex: query, $options: "i" } },
+          { email: { $regex: query, $options: "i" } },
+        ],
+      })
+      .select("name email image")
+      .skip(itemsPerPage * (page - 1))
+      .limit(itemsPerPage);
+    return users;
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 export const getTotalUsers = async () => {
-  const totalUsers = await userModel.find({ active: true }).count();
-  return totalUsers;
+  try {
+    const totalUsers = await userModel.find({ active: true }).count();
+    return totalUsers;
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 export const addUser = async (name, email, password, image) => {
   try {
-    let active = true;
     const response = await userModel.create({
       name,
       email,
       password,
       image,
-      active,
+      active: true,
     });
     return response;
   } catch (error) {
