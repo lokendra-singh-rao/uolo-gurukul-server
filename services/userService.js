@@ -2,12 +2,13 @@ import * as userRepository from "../repositories/userRepository.js";
 import { v4 } from "uuid";
 import { encryptPassword } from "../utilities/passwordUtils.js";
 import { getSignedUrlS3, uploadFile } from "./s3Service.js";
+import { ingestUser, searchUser } from "./elasticSearchService.js";
 
-export const listUsers = async ({ page, query }) => {
+export const listUsers = async ({ page }) => {
   try {
     const itemsPerPage = 8;
 
-    const users = await userRepository.listUsers({ page, query, itemsPerPage });
+    const users = await userRepository.listUsers({ page, itemsPerPage });
 
     const totalActiveUsers = await userRepository.getTotalUsers();
 
@@ -40,6 +41,12 @@ export const listUsers = async ({ page, query }) => {
   }
 };
 
+export const searchUsers = async ({ page, query }) => {
+  const response = await searchUser(query);
+  console.log(response.body.hits.hits);
+  return { ok: true, data: "Working" };
+};
+
 export const addUser = async ({ name, email, password, image }) => {
   try {
     const emailRegistered = await userRepository.findUserByEmail(email);
@@ -51,14 +58,19 @@ export const addUser = async ({ name, email, password, image }) => {
 
       if (uploadImage.ok) {
         const encryptedPass = await encryptPassword({ password });
-        const response = await userRepository.addUser(
+
+        const mongoResponse = await userRepository.addUser(
           name,
           email,
           encryptedPass,
           keyName
         );
+        console.log(mongoResponse);
+        const elasticResponse = await ingestUser({ mongoResponse });
 
-        if (response) {
+        console.log(elasticResponse);
+
+        if (mongoResponse) {
           return { ok: true, data: "Profile added successfully!" };
         } else {
           return { ok: false, err: "Something went wrong! Please try again" };

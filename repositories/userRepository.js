@@ -1,14 +1,10 @@
 import { userModel } from "../models/userModel.js";
 
-export const listUsers = async ({ page, query, itemsPerPage }) => {
+export const listUsers = async ({ page, itemsPerPage }) => {
   try {
     const users = await userModel
       .find({
         active: true,
-        $or: [
-          { name: { $regex: query, $options: "i" } },
-          { email: { $regex: query, $options: "i" } },
-        ],
       })
       .select("name email image")
       .skip(itemsPerPage * (page - 1))

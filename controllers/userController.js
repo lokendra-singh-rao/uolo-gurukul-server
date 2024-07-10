@@ -18,7 +18,15 @@ export const listUsers = async (req, res) => {
     if (!(isAlphanumeric(query) || isEmailValid(query) || !query)) {
       return res.status(400).json({ error: "search query invalid!" });
     }
-    const response = await userService.listUsers({ page, query });
+
+    let response;
+    if (!query) {
+      //fetching from mongodb
+      response = await userService.listUsers({ page });
+    } else {
+      //fetching from elastic cluster
+      response = await userService.searchUsers({ page, query });
+    }
 
     if (response.ok) {
       return res.status(200).json(response.data);

@@ -27,8 +27,6 @@ export const uploadFile = async ({ imageBuffer, keyName }) => {
       .webp()
       .toBuffer();
 
-    console.log("Resized image buffer:", imageBuffer);
-
     const params = {
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: keyName,
