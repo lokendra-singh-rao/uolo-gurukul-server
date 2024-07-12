@@ -4,6 +4,7 @@ import {
   isEmailValid,
   isNumbericalOnly,
   isValidImage,
+  isValidSearchQuery,
 } from "../utilities/typeValidators.js";
 
 export const listUsers = async (req, res) => {
@@ -11,22 +12,15 @@ export const listUsers = async (req, res) => {
   try {
     // page number validation
     if (page < 1 || !isNumbericalOnly(page)) {
-      return res.status(400).json({ error: "invalid page requested!" });
+      return res.status(400).json({ err: "invalid page requested!" });
     }
 
     // search query validation
-    if (!(isAlphanumeric(query) || isEmailValid(query) || !query)) {
-      return res.status(400).json({ error: "search query invalid!" });
+    if (!(isValidSearchQuery(query) || !query)) {
+      return res.status(400).json({ err: "search query invalid!" });
     }
 
-    let response;
-    if (!query) {
-      //fetching from mongodb
-      response = await userService.listUsers({ page });
-    } else {
-      //fetching from elastic cluster
-      response = await userService.searchUsers({ page, query });
-    }
+    const response = await userService.listUsers({ page, query });
 
     if (response.ok) {
       return res.status(200).json(response.data);
@@ -44,7 +38,7 @@ export const addUser = async (req, res) => {
     const image = req.file;
 
     // name validation
-    if (!isAlphanumeric(name)) {
+    if (!isAlphanumeric(name) || name.length < 3) {
       return res.status(400).json({ err: "invalid name!" });
     }
 

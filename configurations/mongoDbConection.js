@@ -1,15 +1,15 @@
 import mongoose from "mongoose";
 
-export const createConnection = async () => {
+export const checkMongoConnection = async () => {
   try {
     const connect = await mongoose.connect(process.env.MONGO_DB_URI);
     console.log(
-      "💾 MongoDB Connected : ",
+      "✅ MongoDB Connected : ",
       connect.connection.host,
       connect.connection.name
     );
   } catch (err) {
-    console.log(err.message);
+    console.log("❌ Error connecting mongodb", err.message);
     process.exit(1);
   }
 };

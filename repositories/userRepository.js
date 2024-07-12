@@ -15,7 +15,7 @@ export const listUsers = async ({ page, itemsPerPage }) => {
   }
 };
 
-export const getTotalUsers = async () => {
+export const getTotalActiveUsers = async () => {
   try {
     const totalUsers = await userModel.find({ active: true }).count();
     return totalUsers;

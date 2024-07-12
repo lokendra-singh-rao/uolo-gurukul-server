@@ -2,7 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "description": "uolo-gurukul",
-  "main": "test.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
     "start": "node server.js",
