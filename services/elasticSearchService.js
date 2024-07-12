@@ -59,8 +59,6 @@ export async function createIndex() {
         },
       },
     });
-
-    console.log(`Index ${indexName} created successfully`);
   } catch (error) {
     console.error("Error creating index:", error);
     throw error;
@@ -70,7 +68,6 @@ export async function createIndex() {
 // Add a new user
 export async function ingestUser(user) {
   try {
-    console.log("elastic me ", user);
     const response = await client.index({
       index: indexName,
       id: user.id,
@@ -95,7 +92,6 @@ export async function searchUser({ page, query, itemsPerPage }) {
                 {
                   bool: {
                     should: [
-                      // Match query for partial matches in name
                       {
                         match: {
                           name: {
@@ -105,13 +101,11 @@ export async function searchUser({ page, query, itemsPerPage }) {
                           },
                         },
                       },
-                      // Wildcard query for name to match anywhere in the string
                       {
                         wildcard: {
                           "name.keyword": `*${query.toLowerCase()}*`,
                         },
                       },
-                      // Match query for partial matches in email
                       {
                         match: {
                           email: {
@@ -121,7 +115,6 @@ export async function searchUser({ page, query, itemsPerPage }) {
                           },
                         },
                       },
-                      // Wildcard query for email to match anywhere in the string
                       {
                         wildcard: {
                           "email.keyword": `*${query.toLowerCase()}*`,
