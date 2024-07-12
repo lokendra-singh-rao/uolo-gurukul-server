@@ -64,18 +64,39 @@ export const addUser = async ({ name, email, password, image }) => {
           encryptedPass,
           keyName
         );
-        const elasticResponse = await elasticService.ingestUser({
-          id: mongoResponse._id,
-          name: mongoResponse.name,
-          email: mongoResponse.email,
-          image: mongoResponse.image,
-          createdAt: mongoResponse.createdAt,
-          updatedAt: mongoResponse.updatedAt,
-          active: mongoResponse.active,
-        });
-
         if (mongoResponse) {
-          return { ok: true, data: "Profile added successfully!" };
+          const elasticResponse = await elasticService.ingestUser({
+            id: mongoResponse._id,
+            name: mongoResponse.name,
+            email: mongoResponse.email,
+            image: mongoResponse.image,
+            createdAt: mongoResponse.createdAt,
+            updatedAt: mongoResponse.updatedAt,
+            active: mongoResponse.active,
+          });
+
+          if (elasticResponse.ok) {
+            return { ok: true, data: "Profile added successfully!" };
+          } else {
+            const deleteFromMongo = await userRepository.hardDeleteUser(
+              mongoResponse._id
+            );
+            if (deleteFromMongo.ok) {
+              return {
+                ok: false,
+                err: "Something went wrong! Please try again",
+              };
+            } else {
+              console.log(
+                "Data integrity in mongodb and elastic for id ",
+                mongoResponse._id
+              );
+              return {
+                ok: false,
+                err: "Something went wrong! Please try again",
+              };
+            }
+          }
         } else {
           return { ok: false, err: "Something went wrong! Please try again" };
         }
@@ -96,7 +117,7 @@ export const deleteUser = async ({ id }) => {
     if (!user) {
       return { ok: false, err: "User not found!" };
     } else {
-      const response = await userRepository.deleteUser(id);
+      const response = await userRepository.softDeleteUser(id);
       elasticService.deleteUser(user._doc._id);
       return { ok: true, data: "User deleted successfully!" };
     }

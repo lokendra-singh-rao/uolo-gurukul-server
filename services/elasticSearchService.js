@@ -74,7 +74,7 @@ export async function ingestUser(user) {
       body: user,
     });
 
-    return { ok: true, msg: "Elastic insert successful" };
+    return { ok: true, data: "Elastic insert successful" };
   } catch (error) {
     console.error("Error ingesting user:", error);
     return { ok: false, err: "Elastic insert failed" };
@@ -97,7 +97,7 @@ export async function searchUser({ page, query, itemsPerPage }) {
                           name: {
                             query: query,
                             operator: "and",
-                            fuzziness: "AUTO",
+                            // fuzziness: "AUTO",
                           },
                         },
                       },
@@ -111,7 +111,7 @@ export async function searchUser({ page, query, itemsPerPage }) {
                           email: {
                             query: query,
                             operator: "and",
-                            fuzziness: "AUTO",
+                            // fuzziness: "AUTO",
                           },
                         },
                       },

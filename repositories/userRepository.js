@@ -39,7 +39,7 @@ export const addUser = async (name, email, password, image) => {
   }
 };
 
-export const deleteUser = async (id) => {
+export const softDeleteUser = async (id) => {
   try {
     const filter = { _id: id };
     const updateDoc = {
@@ -75,5 +75,16 @@ export const findActiveUserById = async (id) => {
     return user;
   } catch (error) {
     throw new Error(error);
+  }
+};
+
+export const hardDeleteUser = async (id) => {
+  try {
+    const filter = { _id: id };
+
+    const user = await userModel.deleteOne(filter);
+    return { ok: true, data: "user deleted from mongo successfully" };
+  } catch (error) {
+    return { ok: false, data: "user not deleted from mongo" };
   }
 };
