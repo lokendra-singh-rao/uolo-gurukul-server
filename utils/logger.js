@@ -1,5 +1,5 @@
 import winston from "winston";
-
+//date wise logger filename and rotation
 export const logger = winston.createLogger({
   format: winston.format.json(),
   transports: [
@@ -22,3 +22,5 @@ export const logger = winston.createLogger({
     }),
   ],
 });
+
+//response interceptor

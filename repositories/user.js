@@ -1,4 +1,5 @@
 import { userModel } from "../models/userModel.js";
+import { syncUsingChangeStreams } from "../services/elasticSync.js";
 import { logger } from "../utils/logger.js";
 
 export const listUsers = async ({ page, itemsPerPage }) => {
@@ -44,6 +45,9 @@ export const addUser = async (name, email, password, image) => {
       image,
       active: true,
     });
+    console.log("111111");
+    await syncUsingChangeStreams();
+    console.log("222222");
     return { ok: true, status: 200, data: response };
   } catch (err) {
     logger.error("Error in addUser repo", err);
@@ -68,6 +72,7 @@ export const softDeleteUser = async (id) => {
     };
 
     const user = await userModel.updateOne(filter, updateDoc, options);
+    await syncUsingChangeStreams();
     return { ok: true, status: 200, data: user };
   } catch (err) {
     logger.error("Error in softDeleteUser repo", err);
@@ -101,25 +106,6 @@ export const findActiveUserById = async (id) => {
     return { ok: true, status: 200, data: user };
   } catch (err) {
     logger.error("Error in findActiveUserById repo", err);
-    return {
-      ok: false,
-      status: 500,
-      err: "Something went wrong! Please try again",
-    };
-  }
-};
-
-export const hardDeleteUser = async (id) => {
-  try {
-    const filter = { _id: id };
-    const user = await userModel.deleteOne(filter);
-    return {
-      ok: true,
-      status: 200,
-      data: "user deleted from mongo successfully",
-    };
-  } catch (err) {
-    logger.error("Error in hardDeleteUser repo", err);
     return {
       ok: false,
       status: 500,

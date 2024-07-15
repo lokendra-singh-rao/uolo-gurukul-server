@@ -8,6 +8,7 @@ export const client = new Client({
 
 const indexName = "lokendrausers";
 
+// Create index
 export async function createIndex() {
   try {
     const indexExists = await client.indices.exists({ index: indexName });
@@ -85,59 +86,52 @@ export async function ingestUser(user) {
 // Search for users
 export async function searchUser({ page, query, itemsPerPage }) {
   try {
-    const elasticQuery =
-      query && query.length > 0
-        ? {
+    const elasticQuery = {
+      bool: {
+        must: [
+          {
             bool: {
-              must: [
+              should: [
                 {
-                  bool: {
-                    should: [
-                      {
-                        match: {
-                          name: {
-                            query: query,
-                            operator: "and",
-                            // fuzziness: "AUTO",
-                          },
-                        },
-                      },
-                      {
-                        wildcard: {
-                          "name.keyword": `*${query.toLowerCase()}*`,
-                        },
-                      },
-                      {
-                        match: {
-                          email: {
-                            query: query,
-                            operator: "and",
-                            // fuzziness: "AUTO",
-                          },
-                        },
-                      },
-                      {
-                        wildcard: {
-                          "email.keyword": `*${query.toLowerCase()}*`,
-                        },
-                      },
-                    ],
-                    minimum_should_match: 1,
+                  match: {
+                    name: {
+                      query: query,
+                      operator: "and",
+                      // fuzziness: "AUTO",
+                    },
                   },
                 },
                 {
-                  term: {
-                    active: true,
+                  wildcard: {
+                    "name.keyword": `*${query.toLowerCase()}*`,
+                  },
+                },
+                {
+                  match: {
+                    email: {
+                      query: query,
+                      operator: "and",
+                      // fuzziness: "AUTO",
+                    },
+                  },
+                },
+                {
+                  wildcard: {
+                    "email.keyword": `*${query.toLowerCase()}*`,
                   },
                 },
               ],
+              minimum_should_match: 1,
             },
-          }
-        : {
+          },
+          {
             term: {
               active: true,
             },
-          };
+          },
+        ],
+      },
+    };
 
     const result = await client.search({
       index: indexName,
@@ -193,6 +187,22 @@ export async function deleteUser(id) {
       err: "Elastic soft delete failed",
     };
   }
+}
+
+// update User document
+export async function updateUser(id, updates) {
+  try {
+    const response = await client.update({
+      index: indexName,
+      id: id,
+      body: {
+        doc: {
+          updates,
+        },
+      },
+    });
+    console.log("UPDATED ", response);
+  } catch (error) {}
 }
 
 // check if index not present or not connected

@@ -1,8 +1,8 @@
-import * as userRepository from "../repositories/userRepository.js";
+import * as userRepository from "../repositories/user.js";
 import { v4 } from "uuid";
 import { encryptPassword } from "../utils/passwordUtils.js";
-import * as elasticService from "./elasticSearchService.js";
-import { getFileUrl, uploadFile } from "../middlewares/storageService.js";
+import * as elasticService from "./elasticSearch.js";
+import { getFileUrl, uploadFile } from "./storage.js";
 import { logger } from "../utils/logger.js";
 
 export const listUsers = async ({ page, query }) => {
@@ -78,42 +78,13 @@ export const addUser = async ({ name, email, password, image }) => {
           keyName
         );
         if (mongoResponse.ok) {
-          const elasticResponse = await elasticService.ingestUser({
-            id: mongoResponse.data._id,
-            name: mongoResponse.data.name,
-            email: mongoResponse.data.email,
-            image: mongoResponse.data.image,
-            createdAt: mongoResponse.data.createdAt,
-            updatedAt: mongoResponse.data.updatedAt,
-            active: mongoResponse.data.active,
-          });
-
-          if (elasticResponse.ok) {
-            return {
-              ok: true,
-              status: 200,
-              data: "Profile added successfully!",
-            };
-          } else {
-            const hardDeleteUser = await userRepository.hardDeleteUser(
-              mongoResponse._id
-            );
-            if (hardDeleteUser.ok) {
-              return {
-                ok: false,
-                status: 500,
-                err: "Something went wrong! Please try again",
-              };
-            } else {
-              logger.error("Data integrity for id ", mongoResponse._id);
-              return {
-                ok: false,
-                status: 500,
-                err: "Something went wrong! Please try again",
-              };
-            }
-          }
+          return {
+            ok: true,
+            status: 200,
+            data: "Profile added successfully!",
+          };
         } else {
+          logger.error("Error adding profile in mongodb for", email);
           return {
             ok: false,
             status: 500,
@@ -121,6 +92,7 @@ export const addUser = async ({ name, email, password, image }) => {
           };
         }
       } else {
+        logger.error("Error uploading image for", email);
         return {
           ok: false,
           status: 500,
@@ -147,8 +119,16 @@ export const deleteUser = async ({ id }) => {
       return { ok: false, status: 400, err: "User not found!" };
     } else {
       const response = await userRepository.softDeleteUser(id);
-      elasticService.deleteUser(user.data._doc._id);
-      return { ok: true, status: 200, data: "User deleted successfully!" };
+      if (response.ok) {
+        elasticService.deleteUser(user.data._doc._id);
+        return { ok: true, status: 200, data: "User deleted successfully!" };
+      } else {
+        return {
+          ok: false,
+          status: 500,
+          err: "Something went wrong! Please try again",
+        };
+      }
     }
   } catch (err) {
     logger.error("Error in deleteUser service", err);

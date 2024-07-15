@@ -1,5 +1,5 @@
 import sharp from "sharp";
-import * as s3Service from "../services/s3Service.js";
+import * as uploadService from "./s3.js";
 
 export async function uploadFile({ imageBuffer, keyName }) {
   imageBuffer = await sharp(imageBuffer)
@@ -11,11 +11,11 @@ export async function uploadFile({ imageBuffer, keyName }) {
     })
     .webp()
     .toBuffer();
-  const response = s3Service.uploadFile({ imageBuffer, keyName });
+  const response = uploadService.uploadFile({ imageBuffer, keyName });
   return response;
 }
 
 export async function getFileUrl(keyName) {
-  const response = s3Service.getSignedUrlS3(keyName);
+  const response = uploadService.getSignedUrlS3(keyName);
   return response;
 }

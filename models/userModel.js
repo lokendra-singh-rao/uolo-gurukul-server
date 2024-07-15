@@ -30,3 +30,5 @@ const userSchema = mongoose.Schema(
 );
 
 export const userModel = mongoose.model("Lokendrausers", userSchema);
+
+export const changeStream = userModel.watch();
