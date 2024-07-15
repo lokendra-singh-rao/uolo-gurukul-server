@@ -17,11 +17,11 @@ const userSchema = mongoose.Schema(
     },
     image: {
       type: String,
-      required: [true, "Image key cannot be empty"],
+      required: [true, "Image key cannot be empty!"],
     },
     active: {
       type: Boolean,
-      required: [true, "Active status cannotbe empty"],
+      required: [true, "Active status cannot be empty!"],
     },
   },
   {

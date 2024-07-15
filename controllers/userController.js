@@ -1,11 +1,12 @@
 import * as userService from "../services/userService.js";
+import { logger } from "../utils/logger.js";
 import {
   isAlphanumeric,
   isEmailValid,
   isNumbericalOnly,
   isValidImage,
   isValidSearchQuery,
-} from "../utilities/typeValidators.js";
+} from "../utils/typeValidators.js";
 
 export const listUsers = async (req, res) => {
   const { page, query } = req.query;
@@ -23,12 +24,15 @@ export const listUsers = async (req, res) => {
     const response = await userService.listUsers({ page, query });
 
     if (response.ok) {
-      return res.status(200).json(response.data);
+      return res.status(response.status).json(response.data);
     } else {
-      return res.status(400).json({ err: response.err });
+      return res.status(response.status).json({ err: response.err });
     }
   } catch (err) {
-    return res.status(400).json({ err: err.message });
+    logger.error("Error in listUser", err);
+    return res
+      .status(500)
+      .json({ err: "Something went wrong! Please try again" });
   }
 };
 
@@ -60,28 +64,29 @@ export const addUser = async (req, res) => {
     });
 
     if (response.ok) {
-      return res.status(200).json(response.data);
+      return res.status(response.status).json(response.data);
     } else {
-      return res.status(400).json({ err: response.err });
+      return res.status(response.status).json({ err: response.err });
     }
   } catch (err) {
-    return res.status(400).json({ err: err.message });
+    logger.error("Error in addUser", err);
+    return res.status(500).json({ err: err.message });
   }
 };
 
 export const deleteUser = async (req, res) => {
   try {
     const { id } = req.query;
-    // id validation - will be implemented when we have a specific id format
 
     const response = await userService.deleteUser({ id });
 
     if (response.ok) {
-      return res.status(200).json({ message: response.data });
+      return res.status(response.status).json({ message: response.data });
     } else {
-      return res.status(200).json({ err: response.err });
+      return res.status(response.status).json({ err: response.err });
     }
   } catch (err) {
-    return res.status(400).json({ err: err.message });
+    logger.error("Error in deleteUser", err);
+    return res.status(500).json({ err: err.message });
   }
 };

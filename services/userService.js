@@ -1,8 +1,9 @@
 import * as userRepository from "../repositories/userRepository.js";
 import { v4 } from "uuid";
-import { encryptPassword } from "../utilities/passwordUtils.js";
-import { getSignedUrlS3, uploadFile } from "./s3Service.js";
+import { encryptPassword } from "../utils/passwordUtils.js";
 import * as elasticService from "./elasticSearchService.js";
+import { getFileUrl, uploadFile } from "../middlewares/storageService.js";
+import { logger } from "../utils/logger.js";
 
 export const listUsers = async ({ page, query }) => {
   try {
@@ -13,36 +14,48 @@ export const listUsers = async ({ page, query }) => {
       itemsPerPage,
     });
 
-    const totalActiveUsers = elasticResponse?.totalActiveUsers;
-    const users = elasticResponse?.users;
+    if (elasticResponse.ok) {
+      const totalActiveUsers = elasticResponse?.data?.totalActiveUsers;
+      const users = elasticResponse?.data?.users;
 
-    const totalPages =
-      totalActiveUsers % itemsPerPage == 0
-        ? totalActiveUsers / itemsPerPage
-        : totalActiveUsers / itemsPerPage + 1;
+      const totalPages =
+        totalActiveUsers % itemsPerPage == 0
+          ? totalActiveUsers / itemsPerPage
+          : totalActiveUsers / itemsPerPage + 1;
 
-    if (page > totalPages) {
-      page = 1;
-    }
-
-    for (let user of users) {
-      const signedImage = await getSignedUrlS3(user.image);
-      if (signedImage.ok) {
-        user.image = signedImage?.data;
-      } else {
-        user.image = "http://localhost:8080/images/defaultImage.webp";
+      if (page > totalPages) {
+        page = 1;
       }
-    }
-    const data = {
-      currentPage: page,
-      totalPages: parseInt(totalPages),
-      filteredUsers: users,
-    };
 
-    return { ok: true, data: data };
+      for (let user of users) {
+        const signedImage = await getFileUrl(user.image);
+        if (signedImage.ok) {
+          user.image = signedImage?.data;
+        } else {
+          user.image = "http://localhost:8080/images/defaultImage.webp";
+        }
+      }
+      const data = {
+        currentPage: parseInt(page),
+        totalPages: parseInt(totalPages),
+        filteredUsers: users,
+      };
+
+      return { ok: true, status: 200, data: data };
+    } else {
+      return {
+        ok: false,
+        status: 500,
+        err: "Something went wrong! Please try again",
+      };
+    }
   } catch (err) {
-    console.log(err);
-    return { ok: false, err: "Something went wrong! Please try again" };
+    logger.error("Error in listUsers service", err);
+    return {
+      ok: false,
+      status: 500,
+      err: "Something went wrong! Please try again",
+    };
   }
 };
 
@@ -50,7 +63,7 @@ export const addUser = async ({ name, email, password, image }) => {
   try {
     const emailRegistered = await userRepository.findUserByEmail(email);
 
-    if (!emailRegistered) {
+    if (!emailRegistered.data) {
       const keyName = `lokendrausers/${v4()}`;
       const imageBuffer = image?.buffer;
       const uploadImage = await uploadFile({ imageBuffer, keyName });
@@ -64,64 +77,85 @@ export const addUser = async ({ name, email, password, image }) => {
           encryptedPass,
           keyName
         );
-        if (mongoResponse) {
+        if (mongoResponse.ok) {
           const elasticResponse = await elasticService.ingestUser({
-            id: mongoResponse._id,
-            name: mongoResponse.name,
-            email: mongoResponse.email,
-            image: mongoResponse.image,
-            createdAt: mongoResponse.createdAt,
-            updatedAt: mongoResponse.updatedAt,
-            active: mongoResponse.active,
+            id: mongoResponse.data._id,
+            name: mongoResponse.data.name,
+            email: mongoResponse.data.email,
+            image: mongoResponse.data.image,
+            createdAt: mongoResponse.data.createdAt,
+            updatedAt: mongoResponse.data.updatedAt,
+            active: mongoResponse.data.active,
           });
 
           if (elasticResponse.ok) {
-            return { ok: true, data: "Profile added successfully!" };
+            return {
+              ok: true,
+              status: 200,
+              data: "Profile added successfully!",
+            };
           } else {
-            const deleteFromMongo = await userRepository.hardDeleteUser(
+            const hardDeleteUser = await userRepository.hardDeleteUser(
               mongoResponse._id
             );
-            if (deleteFromMongo.ok) {
+            if (hardDeleteUser.ok) {
               return {
                 ok: false,
+                status: 500,
                 err: "Something went wrong! Please try again",
               };
             } else {
-              console.log(
-                "Data integrity in mongodb and elastic for id ",
-                mongoResponse._id
-              );
+              logger.error("Data integrity for id ", mongoResponse._id);
               return {
                 ok: false,
+                status: 500,
                 err: "Something went wrong! Please try again",
               };
             }
           }
         } else {
-          return { ok: false, err: "Something went wrong! Please try again" };
+          return {
+            ok: false,
+            status: 500,
+            err: "Something went wrong! Please try again",
+          };
         }
       } else {
-        return { ok: false, err: "Something went wrong! Please try again" };
+        return {
+          ok: false,
+          status: 500,
+          err: "Something went wrong! Please try again",
+        };
       }
     } else {
-      return { ok: false, err: "Email already registered!" };
+      return { ok: false, status: 400, err: "Email already registered!" };
     }
   } catch (err) {
-    return { ok: false, err: "Something went wrong! Please try again" };
+    logger.error("Error in addUser service", err);
+    return {
+      ok: false,
+      status: 500,
+      err: "Something went wrong! Please try again",
+    };
   }
 };
 
 export const deleteUser = async ({ id }) => {
   try {
     const user = await userRepository.findActiveUserById(id);
-    if (!user) {
-      return { ok: false, err: "User not found!" };
+    if (!user.data) {
+      return { ok: false, status: 400, err: "User not found!" };
     } else {
       const response = await userRepository.softDeleteUser(id);
-      elasticService.deleteUser(user._doc._id);
-      return { ok: true, data: "User deleted successfully!" };
+      elasticService.deleteUser(user.data._doc._id);
+      return { ok: true, status: 200, data: "User deleted successfully!" };
     }
   } catch (err) {
-    return { ok: false, err: "Something went wrong! Please try again" };
+    logger.error("Error in deleteUser service", err);
+    return {
+      ok: false,
+      status: 500,
+      err: "Something went wrong! Please try again",
+    };
   }
 };

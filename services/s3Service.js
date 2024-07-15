@@ -5,7 +5,6 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import "dotenv/config";
-import sharp from "sharp";
 
 const client = new S3Client({
   region: process.env.AWS_REGION,
@@ -17,16 +16,6 @@ const client = new S3Client({
 
 export const uploadFile = async ({ imageBuffer, keyName }) => {
   try {
-    imageBuffer = await sharp(imageBuffer)
-      .resize({
-        width: 400,
-        height: 400,
-        fit: sharp.fit.inside,
-        withoutEnlargement: true,
-      })
-      .webp()
-      .toBuffer();
-
     const params = {
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: keyName,
@@ -36,9 +25,9 @@ export const uploadFile = async ({ imageBuffer, keyName }) => {
     const command = new PutObjectCommand(params);
     const data = await client.send(command);
 
-    return { ok: true, data: data };
+    return { ok: true, status: 200, data: data };
   } catch (err) {
-    return { ok: false, err: err.message };
+    return { ok: false, status: 500, err: err.message };
   }
 };
 
@@ -52,8 +41,8 @@ export const getSignedUrlS3 = async (keyName) => {
     const command = new GetObjectCommand(params);
 
     const url = await getSignedUrl(client, command, { expiresIn: 3600 });
-    return { ok: true, data: url };
+    return { ok: true, status: 200, data: url };
   } catch (err) {
-    return { ok: false, err: err.message };
+    return { ok: false, status: 500, err: err.message };
   }
 };

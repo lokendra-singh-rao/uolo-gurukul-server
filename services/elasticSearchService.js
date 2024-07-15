@@ -1,8 +1,9 @@
 import { Client } from "@elastic/elasticsearch";
+import { logger } from "../utils/logger.js";
 
 export const client = new Client({
   node: "http://192.168.163.152:9200",
-  requestTimeout: 2000,
+  requestTimeout: 5000,
 });
 
 const indexName = "lokendrausers";
@@ -60,7 +61,7 @@ export async function createIndex() {
       },
     });
   } catch (error) {
-    console.error("Error creating index:", error);
+    logger.error("Error creating index:", error);
     throw error;
   }
 }
@@ -76,7 +77,7 @@ export async function ingestUser(user) {
 
     return { ok: true, data: "Elastic insert successful" };
   } catch (error) {
-    console.error("Error ingesting user:", error);
+    logger.error("Error ingesting user:", error);
     return { ok: false, err: "Elastic insert failed" };
   }
 }
@@ -153,12 +154,20 @@ export async function searchUser({ page, query, itemsPerPage }) {
       ...hit._source,
     }));
     return {
-      totalActiveUsers: result.body.hits.total.value,
-      users: users,
+      ok: true,
+      status: 200,
+      data: {
+        totalActiveUsers: result.body.hits.total.value,
+        users: users,
+      },
     };
   } catch (error) {
-    console.error("Error searching users:", error);
-    throw error;
+    logger.error("Error searching users in elastic :", error);
+    return {
+      ok: false,
+      status: 500,
+      err: "Something went wrong! Please try again",
+    };
   }
 }
 
@@ -175,11 +184,12 @@ export async function deleteUser(id) {
         },
       },
     });
-    return { ok: true, data: "Elastic soft delete successful" };
+    return { ok: true, status: 200, data: "Elastic soft delete successful" };
   } catch (error) {
-    console.error("Error soft deleting user:", error);
+    logger.error("Error soft deleting user in elastic:", error);
     return {
       ok: false,
+      status: 500,
       err: "Elastic soft delete failed",
     };
   }
@@ -189,9 +199,9 @@ export async function deleteUser(id) {
 export async function initializeElasticsearch() {
   try {
     await createIndex();
-    console.log("✅ Elasticsearch initialized successfully");
+    logger.info("✅ Elasticsearch initialized successfully");
   } catch (error) {
-    console.error("❌ Error initializing Elasticsearch:", error);
+    logger.error("❌ Error initializing Elasticsearch:", error.message);
     throw error;
   }
 }
