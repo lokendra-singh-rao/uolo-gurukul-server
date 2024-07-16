@@ -67,22 +67,6 @@ export async function createIndex() {
   }
 }
 
-// Add a new user
-export async function ingestUser(user) {
-  try {
-    const response = await client.index({
-      index: indexName,
-      id: user.id,
-      body: user,
-    });
-
-    return { ok: true, data: "Elastic insert successful" };
-  } catch (error) {
-    logger.error("Error ingesting user:", error);
-    return { ok: false, err: "Elastic insert failed" };
-  }
-}
-
 // Search for users
 export async function searchUser({ page, query, itemsPerPage }) {
   try {
@@ -142,7 +126,7 @@ export async function searchUser({ page, query, itemsPerPage }) {
         sort: [{ createdAt: { order: "desc" } }],
       },
     });
-
+    console.log(result);
     const users = result.body.hits.hits.map((hit) => ({
       id: hit._id,
       ...hit._source,
@@ -163,46 +147,6 @@ export async function searchUser({ page, query, itemsPerPage }) {
       err: "Something went wrong! Please try again",
     };
   }
-}
-
-// delete a user (set active to false)
-export async function deleteUser(id) {
-  try {
-    const response = await client.update({
-      index: indexName,
-      id: id,
-      body: {
-        doc: {
-          active: false,
-          updatedAt: new Date().toISOString(),
-        },
-      },
-    });
-    return { ok: true, status: 200, data: "Elastic soft delete successful" };
-  } catch (error) {
-    logger.error("Error soft deleting user in elastic:", error);
-    return {
-      ok: false,
-      status: 500,
-      err: "Elastic soft delete failed",
-    };
-  }
-}
-
-// update User document
-export async function updateUser(id, updates) {
-  try {
-    const response = await client.update({
-      index: indexName,
-      id: id,
-      body: {
-        doc: {
-          updates,
-        },
-      },
-    });
-    console.log("UPDATED ", response);
-  } catch (error) {}
 }
 
 // check if index not present or not connected

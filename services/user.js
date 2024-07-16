@@ -120,7 +120,6 @@ export const deleteUser = async ({ id }) => {
     } else {
       const response = await userRepository.softDeleteUser(id);
       if (response.ok) {
-        elasticService.deleteUser(user.data._doc._id);
         return { ok: true, status: 200, data: "User deleted successfully!" };
       } else {
         return {

@@ -1,9 +1,5 @@
 import express from "express";
-import {
-  addUser,
-  deleteUser,
-  listUsers,
-} from "../controllers/userController.js";
+import { addUser, deleteUser, listUsers } from "../controllers/user.js";
 import multer, { memoryStorage } from "multer";
 
 const router = express.Router();

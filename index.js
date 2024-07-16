@@ -3,11 +3,13 @@ import cors from "cors";
 import userRouters from "./routes/userRoute.js";
 import "dotenv/config";
 import { checkMongoConnection } from "./configs/mongoDbConection.js";
-import { initializeElasticsearch } from "./services/elasticSearchService.js";
+import { initializeElasticsearch } from "./services/elasticSearch.js";
 import { logger } from "./utils/logger.js";
+import fs from "fs";
 
 await checkMongoConnection();
 await initializeElasticsearch();
+
 const app = express();
 
 export const port = process.env.PORT || 8080;
