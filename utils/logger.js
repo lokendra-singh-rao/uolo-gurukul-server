@@ -29,7 +29,7 @@ export const logger = winston.createLogger({
   ],
 });
 
-async function rotateLogFiles() {
+export async function rotateLogFiles() {
   const date = new Date();
 
   Date.prototype.subtractDays = function (d) {

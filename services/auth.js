@@ -1,30 +1,61 @@
-import { findUserByEmail } from "../repositories/user";
-import { comparePassword } from "../utils/passwordUtils";
+import { findUserByEmail } from "../repositories/user.js";
+import { logger } from "../utils/logger.js";
+import { comparePassword } from "../utils/passwordUtils.js";
 import jwt from "jsonwebtoken";
+import { getFileUrl } from "../services/storage.js";
+import "dotenv/config";
 
-export const login = async (email, password) => {
+export const login = async ({ email, password }) => {
   try {
     const user = await findUserByEmail(email);
-
     if (user.data) {
-      if (comparePassword(user.data.password, password)) {
+      const originalPassword = user.data.password;
+      const requestedPassword = password;
+      if (await comparePassword({ originalPassword, requestedPassword })) {
         const authToken = jwt.sign(
           {
             user: {
               email: user.data.email,
-              id: user.data.id,
+              id: user.data._id,
             },
           },
           process.env.AUTH_TOKEN_SECRET,
           { expiresIn: "60m" }
         );
+
+        return {
+          ok: true,
+          status: 200,
+          data: {
+            user: {
+              name: user.data.name,
+              image: (await getFileUrl(user.data.image)).data,
+            },
+            token: authToken,
+          },
+        };
       } else {
-        return { ok: false, status: 401, err: "Email/Password incorrect!" };
+        return { ok: false, status: 400, err: "Email/Password incorrect!" };
       }
     } else {
-      return { ok: false, status: 401, err: "Email/Password incorrect!" };
+      return { ok: false, status: 400, err: "Email/Password incorrect!" };
     }
-  } catch (error) {
+  } catch (err) {
+    logger.error(`Error in login service ${err}`);
+    return {
+      ok: false,
+      status: 500,
+      err: "Something went wrong! Please try again",
+    };
+  }
+};
+
+export const verifyToken = async ({ token }) => {
+  try {
+    const response = jwt.verify(token, process.env.AUTH_TOKEN_SECRET);
+    return { ok: true, status: 200, data: response };
+  } catch (err) {
+    logger.error(`Error in login service ${err}`);
     return {
       ok: false,
       status: 500,

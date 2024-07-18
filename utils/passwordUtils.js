@@ -6,10 +6,10 @@ export async function encryptPassword({ password }) {
   return encryptedPassword;
 }
 
-export async function comparePassword({ originalPassword, requestPassword }) {
+export async function comparePassword({ originalPassword, requestedPassword }) {
   const passwordSame = await bcryptjs.compare(
-    originalPassword,
-    requestPassword
+    requestedPassword,
+    originalPassword
   );
   if (!passwordSame) {
     return false;

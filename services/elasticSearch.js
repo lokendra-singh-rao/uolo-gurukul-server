@@ -126,7 +126,6 @@ export async function searchUser({ page, query, itemsPerPage }) {
         sort: [{ createdAt: { order: "desc" } }],
       },
     });
-    console.log(result);
     const users = result.body.hits.hits.map((hit) => ({
       id: hit._id,
       ...hit._source,

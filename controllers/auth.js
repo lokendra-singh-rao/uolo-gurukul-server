@@ -1,5 +1,6 @@
-import jwt from "jsonwebtoken";
-import { logger } from "../utils/logger";
+import { logger } from "../utils/logger.js";
+import * as authService from "../services/auth.js";
+import { isEmailValid } from "../utils/typeValidators.js";
 
 export const login = async (req, res) => {
   try {
@@ -14,8 +15,28 @@ export const login = async (req, res) => {
     if (!password) {
       return res.status(400).json({ err: "invalid password!" });
     }
+
+    const response = await authService.login({ email, password });
+
+    if (response.ok) {
+      res.cookie("token", response.data?.token, {
+        expires: new Date(Date.now() + 86400000),
+        secure: true,
+        httpOnly: true,
+      });
+      res.cookie("user", JSON.stringify(response.data?.user), {
+        expires: new Date(Date.now() + 86400000),
+        secure: true,
+        httpOnly: true,
+      });
+      return res.status(200).json(response.data);
+    } else {
+      return res.status(response.status).json(response);
+    }
   } catch (err) {
     logger.error("Error in login controller", err);
-    return res.status(500).json({ err: "invalid password!" });
+    return res
+      .status(500)
+      .json({ err: "Something went wrong! Please try again" });
   }
 };
