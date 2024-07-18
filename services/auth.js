@@ -20,7 +20,7 @@ export const login = async ({ email, password }) => {
             },
           },
           process.env.AUTH_TOKEN_SECRET,
-          { expiresIn: "60m" }
+          { expiresIn: "30d" }
         );
 
         return {
@@ -38,7 +38,7 @@ export const login = async ({ email, password }) => {
         return { ok: false, status: 400, err: "Email/Password incorrect!" };
       }
     } else {
-      return { ok: false, status: 400, err: "Email/Password incorrect!" };
+      return { ok: false, status: 400, err: "Email not registered!" };
     }
   } catch (err) {
     logger.error(`Error in login service ${err}`);

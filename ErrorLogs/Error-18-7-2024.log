@@ -3,3 +3,6 @@
 {"level":"error","message":"Error in login service JsonWebTokenError: invalid signature","timestamp":"2024-07-18T04:57:48.676Z"}
 {"level":"error","message":"Error in login controller data is not defined","stack":"ReferenceError: data is not defined\n    at login (file:///Users/uolo/Desktop/ONBOARDING%20PROJECT/server/controllers/auth.js:22:27)","timestamp":"2024-07-18T06:01:43.507Z"}
 {"level":"error","message":"Error in login controller option expires is invalid","stack":"TypeError: option expires is invalid\n    at Object.serialize (/Users/uolo/Desktop/ONBOARDING PROJECT/server/node_modules/cookie/index.js:161:13)\n    at ServerResponse.res.cookie (/Users/uolo/Desktop/ONBOARDING PROJECT/server/node_modules/express/lib/response.js:885:36)\n    at login (file:///Users/uolo/Desktop/ONBOARDING%20PROJECT/server/controllers/auth.js:22:11)","timestamp":"2024-07-18T06:02:05.586Z"}
+{"level":"error","message":"Error in login service JsonWebTokenError: invalid token","timestamp":"2024-07-18T06:35:05.599Z"}
+{"level":"error","message":"Error in login service JsonWebTokenError: jwt malformed","timestamp":"2024-07-18T06:35:39.215Z"}
+{"level":"error","message":"Error in login service JsonWebTokenError: invalid token","timestamp":"2024-07-18T06:37:20.663Z"}

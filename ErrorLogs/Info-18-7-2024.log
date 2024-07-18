@@ -51,3 +51,27 @@
 {"level":"info","message":"✅ MongoDB Connected : ","timestamp":"2024-07-18T06:08:00.141Z"}
 {"level":"info","message":"✅ Elasticsearch initialized successfully","timestamp":"2024-07-18T06:08:00.293Z"}
 {"level":"info","message":"✅ Server running at http://localhost:8080","timestamp":"2024-07-18T06:08:00.296Z"}
+{"level":"info","message":"✅ MongoDB Connected : ","timestamp":"2024-07-18T06:16:14.997Z"}
+{"level":"info","message":"✅ Elasticsearch initialized successfully","timestamp":"2024-07-18T06:16:15.193Z"}
+{"level":"info","message":"✅ Server running at http://localhost:8080","timestamp":"2024-07-18T06:16:15.196Z"}
+{"level":"info","message":"✅ MongoDB Connected : ","timestamp":"2024-07-18T06:21:02.100Z"}
+{"level":"info","message":"✅ Elasticsearch initialized successfully","timestamp":"2024-07-18T06:21:02.241Z"}
+{"level":"info","message":"✅ Server running at http://localhost:8080","timestamp":"2024-07-18T06:21:02.244Z"}
+{"level":"info","message":"✅ MongoDB Connected : ","timestamp":"2024-07-18T06:21:08.471Z"}
+{"level":"info","message":"✅ Elasticsearch initialized successfully","timestamp":"2024-07-18T06:21:08.623Z"}
+{"level":"info","message":"✅ Server running at http://localhost:8080","timestamp":"2024-07-18T06:21:08.627Z"}
+{"level":"info","message":"✅ MongoDB Connected : ","timestamp":"2024-07-18T06:24:02.084Z"}
+{"level":"info","message":"✅ Elasticsearch initialized successfully","timestamp":"2024-07-18T06:24:02.230Z"}
+{"level":"info","message":"✅ Server running at http://localhost:8080","timestamp":"2024-07-18T06:24:02.235Z"}
+{"level":"info","message":"✅ MongoDB Connected : ","timestamp":"2024-07-18T06:26:12.689Z"}
+{"level":"info","message":"✅ Elasticsearch initialized successfully","timestamp":"2024-07-18T06:26:12.843Z"}
+{"level":"info","message":"✅ Server running at http://localhost:8080","timestamp":"2024-07-18T06:26:12.848Z"}
+{"level":"error","message":"Error in login service JsonWebTokenError: invalid token","timestamp":"2024-07-18T06:35:05.599Z"}
+{"level":"error","message":"Error in login service JsonWebTokenError: jwt malformed","timestamp":"2024-07-18T06:35:39.215Z"}
+{"level":"error","message":"Error in login service JsonWebTokenError: invalid token","timestamp":"2024-07-18T06:37:20.663Z"}
+{"level":"info","message":"✅ MongoDB Connected : ","timestamp":"2024-07-18T06:38:13.067Z"}
+{"level":"info","message":"✅ Elasticsearch initialized successfully","timestamp":"2024-07-18T06:38:13.220Z"}
+{"level":"info","message":"✅ Server running at http://localhost:8080","timestamp":"2024-07-18T06:38:13.223Z"}
+{"level":"info","message":"✅ MongoDB Connected : ","timestamp":"2024-07-18T06:38:40.485Z"}
+{"level":"info","message":"✅ Elasticsearch initialized successfully","timestamp":"2024-07-18T06:38:40.646Z"}
+{"level":"info","message":"✅ Server running at http://localhost:8080","timestamp":"2024-07-18T06:38:40.651Z"}

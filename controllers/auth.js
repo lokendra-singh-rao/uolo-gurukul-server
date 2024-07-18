@@ -40,3 +40,9 @@ export const login = async (req, res) => {
       .json({ err: "Something went wrong! Please try again" });
   }
 };
+
+export const logout = async (req, res) => {
+  res.clearCookie("token");
+  res.clearCookie("user");
+  res.status(200).json("Logged out successfully!");
+};
