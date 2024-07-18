@@ -22,13 +22,15 @@ export const login = async (req, res) => {
       res.cookie("token", response.data?.token, {
         expires: new Date(Date.now() + 86400000),
         secure: true,
-        httpOnly: true,
+        httpOnly: false,
       });
+
       res.cookie("user", JSON.stringify(response.data?.user), {
         expires: new Date(Date.now() + 86400000),
         secure: true,
-        httpOnly: true,
+        httpOnly: false,
       });
+
       return res.status(200).json(response.data);
     } else {
       return res.status(response.status).json(response);
